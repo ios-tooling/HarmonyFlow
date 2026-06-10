@@ -7,27 +7,57 @@
 
 import SwiftUI
 
-@MainActor @Observable public class HarmonyCoordinator<Screen: HarmonyScreen> {
+@MainActor @Observable public class HarmonyCoordinator<Screen: HarmonyScreen>: Identifiable {
 	var _screens: [ScreenAction] = []
 	
 	var parentCoordinator: HarmonyCoordinator<Screen>?
-	var suppliesRoot = false
+	var childCoordinator: HarmonyCoordinator<Screen>?
+	var root: Screen
+	var action = HarmonyAction.push
 	
-	public init(parentCoordinator: HarmonyCoordinator<Screen>? = nil) {
-		self.parentCoordinator = parentCoordinator
+	nonisolated public var id: String { "\(self)" }
+	
+	public init(_ screen: Screen) {
+		root = screen
 	}
-
-	public init(_ kind: Screen.Type) {
-	}
-
+	
 	public init(_ path: [Screen]) {
-		_screens = path.map { ScreenAction(screen: $0, action: .push) }
+		root = path[0]
+		_screens = path.dropFirst().map { ScreenAction(screen: $0, action: .push) }
 	}
-
-	var allScreens: [Screen] {
+	
+	func removeFromParentCoordinator() {
+		guard let parentCoordinator else { return }
+		
+		parentCoordinator.childCoordinator = nil
+	}
+	
+	func addChild(_ screen: Screen, action: HarmonyAction) {
+		let new = HarmonyCoordinator([screen])
+		new.action = action
+		
+		childCoordinator = new
+		new.parentCoordinator = self
+		
+	}
+	
+	var sheetCoordinator: HarmonyCoordinator<Screen>? {
 		get {
-			if let parentCoordinator { return parentCoordinator.allScreens + fullPath }
-			return fullPath
+			guard let childCoordinator, childCoordinator.action.isSheet else { return nil }
+			return childCoordinator
+		}
+		set {
+			childCoordinator = nil
+		}
+	}
+	
+	var fullScreenCoordinator: HarmonyCoordinator<Screen>? {
+		get {
+			guard let childCoordinator, childCoordinator.action == .fullScreenModal else { return nil }
+			return childCoordinator
+		}
+		set {
+			childCoordinator = nil
 		}
 	}
 }

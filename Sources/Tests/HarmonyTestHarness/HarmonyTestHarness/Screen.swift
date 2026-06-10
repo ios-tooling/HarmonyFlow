@@ -23,18 +23,24 @@ enum Screen: String, HarmonyScreen {
 				Text("main")
 				
 				Button("Settings") {
-					configuration.coordinator.push(.settings)
+					configuration.coordinator.partialModal(.settings)
 				}
 			}
-			
+			.navigationTitle("Main")
+
 		case .settings:
 			VStack {
+				Text("settings")
+
 				Button("Dismiss") {
 					configuration.coordinator.dismiss()
 				}
+				Button("main") {
+					configuration.coordinator.push(.main)
+				}
 
-				Text("settings")
 			}
+			.navigationTitle("Settings")
 		}
 	}
 }

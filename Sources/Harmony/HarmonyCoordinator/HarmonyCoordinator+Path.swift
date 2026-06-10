@@ -14,13 +14,9 @@ extension HarmonyCoordinator {
 	
 	var navigationPathBinding: Binding<NavigationPath> {
 		Binding(get: {
-			var path = self.fullPath
-			if self.suppliesRoot, !path.isEmpty { path.remove(at: 0) }
-			return NavigationPath(path)
+			return NavigationPath(self.fullPath)
 		}, set: { newPath in
 			var navPath = self.fullPath
-			if self.suppliesRoot { navPath.remove(at: 0) }
-			
 			while newPath.count < navPath.count {
 				navPath.removeLast()
 				self._screens.removeLast()
