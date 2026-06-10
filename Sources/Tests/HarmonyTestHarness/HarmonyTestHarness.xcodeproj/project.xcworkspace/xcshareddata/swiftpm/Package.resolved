@@ -1,0 +1,51 @@
+{
+  "originHash" : "19ad05753a07486a9573a93c06bfba6027a6313d130acc30413837fc42cf9d9d",
+  "pins" : [
+    {
+      "identity" : "chronicle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-tooling/chronicle",
+      "state" : {
+        "revision" : "5a44da99206272e63c299857edff548c95a378a5",
+        "version" : "0.0.29"
+      }
+    },
+    {
+      "identity" : "cloudseeding",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-tooling/cloudseeding",
+      "state" : {
+        "revision" : "d25fa5226c974678bd3823c14aeaf6db28827225",
+        "version" : "0.2.1"
+      }
+    },
+    {
+      "identity" : "suite",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-tooling/suite",
+      "state" : {
+        "revision" : "959d2d2f9e696aa25dfe576ba8a7ef5324d8b08a",
+        "version" : "1.4.11"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
+        "version" : "603.0.2"
+      }
+    },
+    {
+      "identity" : "tagalong",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-tooling/TagAlong",
+      "state" : {
+        "revision" : "c15cd80a5870989c6d12ecdcad1e32d81bf550a8",
+        "version" : "0.0.5"
+      }
+    }
+  ],
+  "version" : 3
+}
