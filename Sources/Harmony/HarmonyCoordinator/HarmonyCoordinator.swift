@@ -7,12 +7,16 @@
 
 import SwiftUI
 
-@MainActor @Observable public class HarmonyCoordinator<Screen: HarmonyScreen>: Identifiable {
+@MainActor @Observable public class HarmonyCoordinator<Screen: HarmonyScreen>: Identifiable, HarmonyBottomSheetHosting {
 	var _screens: [ScreenAction] = []
-	
+
 	var parentCoordinator: HarmonyCoordinator<Screen>?
 	var modalCoordinator: HarmonyCoordinator<Screen>?
 	var bottomSheetCoordinator: HarmonyCoordinator<Screen>?
+
+	// when set (e.g. by a tab coordinator), bottom sheets presented here are hosted
+	// there instead, so they can render above container chrome like the tab bar
+	@ObservationIgnored weak var externalBottomSheetHost: (any HarmonyBottomSheetHosting<Screen>)?
 	var root: Screen
 	var configuration = HarmonyNavigationConfiguration(action: .push)
 
@@ -31,6 +35,11 @@ import SwiftUI
 	}
 	
 	func removeFromParentCoordinator() {
+		if let externalBottomSheetHost {
+			if externalBottomSheetHost.bottomSheetCoordinator === self { externalBottomSheetHost.bottomSheetCoordinator = nil }
+			return
+		}
+
 		guard let parentCoordinator else { return }
 
 		if parentCoordinator.modalCoordinator === self { parentCoordinator.modalCoordinator = nil }
@@ -50,7 +59,13 @@ import SwiftUI
 		if configuration.action == .bottomSheet {
 			let host = bottomSheetHost
 			new.parentCoordinator = host
-			host.bottomSheetCoordinator = new
+
+			if let external = host.externalBottomSheetHost {
+				new.externalBottomSheetHost = external
+				external.bottomSheetCoordinator = new
+			} else {
+				host.bottomSheetCoordinator = new
+			}
 		} else {
 			new.parentCoordinator = self
 			modalCoordinator = new

@@ -36,4 +36,15 @@ extension HarmonyCoordinator {
 	public func dismissStack() {
 		removeFromParentCoordinator()
 	}
+
+	public func popToRoot() {
+		_screens.removeAll()
+	}
+
+	// returns the stack to its pristine root: pops all pushes and drops anything it presented
+	public func collapse() {
+		_screens.removeAll()
+		modalCoordinator = nil
+		bottomSheetCoordinator = nil
+	}
 }

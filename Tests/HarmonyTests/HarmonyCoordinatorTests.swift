@@ -15,7 +15,20 @@ enum TestScreen: String, HarmonyScreen {
 	var id: String { rawValue }
 
 	func body(configuration: HarmonyCoordinator<Self>.ScreenConfiguration) -> some View {
-		Text(rawValue)
+		VStack {
+			Text(rawValue)
+			EnvironmentProbe()
+		}
+	}
+}
+
+// mirrors how real apps reach the coordinator from nested views; rendering this
+// traps if HarmonyStack ever fails to inject the coordinator into the environment
+struct EnvironmentProbe: View {
+	@Environment(HarmonyCoordinator<TestScreen>.self) private var coordinator
+
+	var body: some View {
+		Text("depth \(coordinator.fullPath.count)")
 	}
 }
 

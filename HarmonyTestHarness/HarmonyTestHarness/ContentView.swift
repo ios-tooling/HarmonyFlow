@@ -9,15 +9,10 @@ import SwiftUI
 import Harmony
 
 struct ContentView: View {
-	@State private var coordinator = HarmonyCoordinator([Screen.main])
-	
+	@State private var coordinator = HarmonyTabCoordinator(selected: AppTab.home)
+
 	var body: some View {
-		HarmonyStack(coordinator)
-//		{
-//			Button(action: { coordinator.push(.main) }) {
-//				Text("Go to Main")
-//			}
-//		}
+		HarmonyTabs(coordinator)
 	}
 }
 

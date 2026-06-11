@@ -35,6 +35,8 @@ enum Screen: String, HarmonyScreen {
 				}
 
 				CloseFlowButton()
+
+				SettingsTabButton()
 			}
 			.navigationTitle("Main")
 
