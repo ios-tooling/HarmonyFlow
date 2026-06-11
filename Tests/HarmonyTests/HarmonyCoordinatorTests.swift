@@ -81,6 +81,24 @@ struct HarmonyCoordinatorTests {
 		#endif
 	}
 
+	@Test func popToScreenDropsEverythingAboveIt() {
+		let coordinator = HarmonyCoordinator([TestScreen.home, .detail, .settings, .detail, .settings])
+		coordinator.pop(to: .detail)
+		#expect(coordinator.fullPath == [.detail, .settings, .detail])
+	}
+
+	@Test func popToRootScreenClearsThePath() {
+		let coordinator = HarmonyCoordinator([TestScreen.home, .detail, .settings])
+		coordinator.pop(to: .home)
+		#expect(coordinator.fullPath.isEmpty)
+	}
+
+	@Test func popToMissingScreenDoesNothing() {
+		let coordinator = HarmonyCoordinator([TestScreen.home, .detail])
+		coordinator.pop(to: .settings)
+		#expect(coordinator.fullPath == [.detail])
+	}
+
 	@Test func dismissPopsPushedScreenFirst() {
 		let coordinator = HarmonyCoordinator(TestScreen.home)
 		coordinator.push(.detail)

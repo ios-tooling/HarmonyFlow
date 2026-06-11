@@ -26,6 +26,14 @@ enum Screen: String, HarmonyScreen {
 					configuration.coordinator.partialModal(.settings)
 				}
 
+				Button("Push Settings") {
+					configuration.coordinator.push(.settings)
+				}
+
+				Button("Full Screen Settings") {
+					configuration.coordinator.fullScreenModal(.settings)
+				}
+
 				Button("Bottom Sheet") {
 					configuration.coordinator.show(.settings, config: .init(action: .bottomSheet, detents: [.fraction(0.25), .medium, .fraction(0.85)]))
 				}
@@ -37,6 +45,8 @@ enum Screen: String, HarmonyScreen {
 				CloseFlowButton()
 
 				SettingsTabButton()
+
+				ToggleTabBarButton()
 			}
 			.navigationTitle("Main")
 

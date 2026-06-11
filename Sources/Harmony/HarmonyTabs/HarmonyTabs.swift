@@ -21,6 +21,9 @@ public struct HarmonyTabs<Tab: HarmonyTab>: View {
 			ForEach(Array(Tab.allCases), id: \.self) { tab in
 				SwiftUI.Tab(value: tab) {
 					HarmonyStack(coordinator.coordinator(for: tab))
+					#if os(iOS)
+						.toolbarVisibility(coordinator.isTabBarHidden ? .hidden : .automatic, for: .tabBar)
+					#endif
 				} label: {
 					tab.label
 				}
@@ -34,6 +37,7 @@ public struct HarmonyTabs<Tab: HarmonyTab>: View {
 			}
 		}
 		.animation(.spring, value: coordinator.bottomSheetCoordinator?.id)
+		.animation(.easeInOut, value: coordinator.isTabBarHidden)
 		.environment(coordinator)
 	}
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 @MainActor @Observable public class HarmonyTabCoordinator<Tab: HarmonyTab>: HarmonyBottomSheetHosting {
 	public var selectedTab: Tab
+	public var isTabBarHidden = false
 	var bottomSheetCoordinator: HarmonyCoordinator<Tab.Screen>?
 	private var stacks: [Tab: HarmonyCoordinator<Tab.Screen>] = [:]
 

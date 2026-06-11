@@ -41,6 +41,16 @@ extension HarmonyCoordinator {
 		_screens.removeAll()
 	}
 
+	// pops back to the most recent occurrence of the screen; popping to the root
+	// screen clears the path, and a screen not in the stack is a no-op
+	public func pop(to screen: Screen) {
+		if let index = _screens.lastIndex(where: { $0.screen == screen }) {
+			_screens.removeSubrange(_screens.index(after: index)...)
+		} else if screen == root {
+			popToRoot()
+		}
+	}
+
 	// returns the stack to its pristine root: pops all pushes and drops anything it presented
 	public func collapse() {
 		_screens.removeAll()
