@@ -29,6 +29,14 @@ public struct HarmonyStack<Screen: HarmonyScreen>: View {
 				}
 		}
 		.environment(coordinator)
+		.overlay(alignment: .bottom) {
+			if let bottomSheet = coordinator.bottomSheetCoordinator {
+				HarmonyBottomSheet(coordinator: bottomSheet)
+					.id(bottomSheet.id)
+					.transition(.identity)		// the sheet's layers transition individually: card slides, scrim fades
+			}
+		}
+		.animation(.spring, value: coordinator.bottomSheetCoordinator?.id)
 		#if os(iOS)
 			.sheet(item: $coordinator.sheetCoordinator) { sheet in
 				HarmonyStack(sheet)

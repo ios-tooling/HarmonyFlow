@@ -12,6 +12,15 @@ public enum HarmonyDetent: Hashable, Sendable {
 	case large
 	case fraction(Double)
 	case height(Double)
+
+	func resolvedHeight(in containerHeight: CGFloat) -> CGFloat {
+		switch self {
+		case .medium: containerHeight * 0.5
+		case .large: containerHeight
+		case .fraction(let fraction): containerHeight * fraction
+		case .height(let height): height
+		}
+	}
 }
 
 #if os(iOS)

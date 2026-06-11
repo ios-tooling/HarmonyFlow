@@ -26,6 +26,10 @@ enum Screen: String, HarmonyScreen {
 					configuration.coordinator.partialModal(.settings)
 				}
 
+				Button("Bottom Sheet") {
+					configuration.coordinator.show(.settings, config: .init(action: .bottomSheet, detents: [.fraction(0.25), .medium, .fraction(0.85)]))
+				}
+
 				Button("Tall Sheet") {
 					configuration.coordinator.show(.settings, config: .init(action: .partialModal, detents: [.fraction(0.75), .large], isInteractiveDismissDisabled: true))
 				}

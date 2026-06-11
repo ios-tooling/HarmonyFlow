@@ -49,20 +49,13 @@ import SwiftUI
 		}
 	}
 
-	// transitional: bottom sheets still present as system sheets until the overlay pass,
-	// so this vends the modal child first, then any bottom sheet — never both
 	var sheetCoordinator: HarmonyCoordinator<Screen>? {
 		get {
-			if let modalCoordinator { return modalCoordinator.action.isSheet ? modalCoordinator : nil }
-			return bottomSheetCoordinator
+			guard let modalCoordinator, modalCoordinator.action.isSheet else { return nil }
+			return modalCoordinator
 		}
 		set {
-			guard newValue == nil else { return }
-			if let modalCoordinator {
-				if modalCoordinator.action.isSheet { self.modalCoordinator = nil }
-			} else {
-				bottomSheetCoordinator = nil
-			}
+			if newValue == nil, modalCoordinator?.action.isSheet == true { modalCoordinator = nil }
 		}
 	}
 

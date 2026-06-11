@@ -119,8 +119,8 @@ struct HarmonyCoordinatorTests {
 	@Test func dismissOnPresentedRootRemovesItFromParent() {
 		let parent = HarmonyCoordinator(TestScreen.home)
 		parent.bottomSheet(.settings)
-		parent.sheetCoordinator?.dismiss()
-		#expect(parent.sheetCoordinator == nil)
+		parent.bottomSheetCoordinator?.dismiss()
+		#expect(parent.bottomSheetCoordinator == nil)
 	}
 
 	@Test func sheetBindingNilOnlyClearsSheetChildren() {
@@ -153,13 +153,21 @@ struct HarmonyCoordinatorTests {
 		#expect(parent.sheetCoordinator?.root == .settings)
 	}
 
-	@Test func modalDismissalRevealsBottomSheet() {
+	@Test func modalDismissalLeavesBottomSheetIntact() {
 		let parent = HarmonyCoordinator(TestScreen.home)
 		parent.bottomSheet(.detail)
 		parent.partialModal(.settings)
 		parent.sheetCoordinator = nil
 		#expect(parent.bottomSheetCoordinator?.root == .detail)
-		#expect(parent.sheetCoordinator?.root == .detail)
+		#expect(parent.modalCoordinator == nil)
+	}
+
+	@Test func bottomSheetsDoNotOccupyTheSheetBinding() {
+		// bottom sheets render as overlays, not system sheets; the sheet binding is modal-only
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.bottomSheet(.detail)
+		#expect(parent.sheetCoordinator == nil)
+		#expect(parent.bottomSheetCoordinator?.root == .detail)
 	}
 
 	@Test func dismissStackClearsOnlyItsOwnSlot() {
@@ -171,16 +179,13 @@ struct HarmonyCoordinatorTests {
 		#expect(parent.sheetCoordinator?.root == .settings)
 	}
 
-	#if os(iOS)
-	@Test func fullScreenModalSuppressesBottomSheetPresentation() {
-		// sheet(item:) and fullScreenCover(item:) can't present simultaneously from one
-		// view; while a cover is up the sheet binding must stay nil — but the bottom
-		// sheet itself survives for when the cover dismisses
+	@Test func fullScreenModalLeavesBottomSheetIntact() {
+		// the overlay isn't a system presentation, so a full-screen cover can come and
+		// go above it without the two ever conflicting
 		let parent = HarmonyCoordinator(TestScreen.home)
 		parent.bottomSheet(.detail)
 		parent.fullScreenModal(.settings)
-		#expect(parent.sheetCoordinator == nil)
-		#expect(parent.bottomSheetCoordinator != nil)
+		#expect(parent.bottomSheetCoordinator?.root == .detail)
+		#expect(parent.modalCoordinator?.root == .settings)
 	}
-	#endif
 }
