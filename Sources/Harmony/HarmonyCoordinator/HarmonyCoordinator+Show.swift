@@ -32,4 +32,8 @@ extension HarmonyCoordinator {
 			_screens.removeLast()
 		}
 	}
+
+	public func dismissStack() {
+		removeFromParentCoordinator()
+	}
 }

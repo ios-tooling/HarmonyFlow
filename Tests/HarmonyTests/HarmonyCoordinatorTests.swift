@@ -75,6 +75,24 @@ struct HarmonyCoordinatorTests {
 		#expect(coordinator.fullPath.isEmpty)
 	}
 
+	@Test func dismissStackRemovesWholePresentedStack() {
+		// a screen deep inside a presented flow can close the entire flow,
+		// without knowing how it was presented
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.partialModal(.settings)
+		let sheet = parent.sheetCoordinator
+		sheet?.push(.detail)
+		sheet?.push(.home)
+		sheet?.dismissStack()
+		#expect(parent.sheetCoordinator == nil)
+	}
+
+	@Test func dismissStackAtRootDoesNothing() {
+		let coordinator = HarmonyCoordinator([TestScreen.home, .detail])
+		coordinator.dismissStack()
+		#expect(coordinator.fullPath == [.detail])
+	}
+
 	@Test func dismissOnPresentedRootRemovesItFromParent() {
 		let parent = HarmonyCoordinator(TestScreen.home)
 		parent.bottomSheet(.settings)

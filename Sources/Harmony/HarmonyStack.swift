@@ -28,6 +28,7 @@ public struct HarmonyStack<Screen: HarmonyScreen>: View {
 					screen.body(configuration: config)
 				}
 		}
+		.environment(coordinator)
 		#if os(iOS)
 			.sheet(item: $coordinator.sheetCoordinator) { sheet in
 				HarmonyStack(sheet)

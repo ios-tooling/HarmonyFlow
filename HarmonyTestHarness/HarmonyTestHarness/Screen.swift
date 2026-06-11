@@ -21,10 +21,12 @@ enum Screen: String, HarmonyScreen {
 		case .main:
 			VStack {
 				Text("main")
-				
+
 				Button("Settings") {
 					configuration.coordinator.partialModal(.settings)
 				}
+
+				CloseFlowButton()
 			}
 			.navigationTitle("Main")
 
