@@ -179,6 +179,36 @@ struct HarmonyCoordinatorTests {
 		#expect(parent.sheetCoordinator?.root == .settings)
 	}
 
+	@Test func bottomSheetsAttachToTheirPresentationContext() {
+		// a bottom sheet presented inside a modal belongs to that modal — it renders
+		// above it and travels with it — not to the root
+		let root = HarmonyCoordinator(TestScreen.home)
+		root.partialModal(.settings)
+		root.modalCoordinator?.bottomSheet(.detail)
+		#expect(root.modalCoordinator?.bottomSheetCoordinator?.root == .detail)
+		#expect(root.bottomSheetCoordinator == nil)
+	}
+
+	@Test func bottomSheetsNeverStackOnBottomSheets() {
+		// presenting from inside a bottom sheet bubbles up to its host and replaces it
+		let root = HarmonyCoordinator(TestScreen.home)
+		root.bottomSheet(.detail)
+		let first = root.bottomSheetCoordinator
+		first?.bottomSheet(.settings)
+		#expect(root.bottomSheetCoordinator !== first)
+		#expect(root.bottomSheetCoordinator?.root == .settings)
+		#expect(first?.bottomSheetCoordinator == nil)
+	}
+
+	@Test func bottomSheetDismissStackClearsItsHostSlot() {
+		let root = HarmonyCoordinator(TestScreen.home)
+		root.partialModal(.settings)
+		root.modalCoordinator?.bottomSheet(.detail)
+		root.modalCoordinator?.bottomSheetCoordinator?.dismissStack()
+		#expect(root.modalCoordinator?.bottomSheetCoordinator == nil)
+		#expect(root.modalCoordinator?.root == .settings)
+	}
+
 	@Test func fullScreenModalLeavesBottomSheetIntact() {
 		// the overlay isn't a system presentation, so a full-screen cover can come and
 		// go above it without the two ever conflicting

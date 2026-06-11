@@ -37,14 +37,22 @@ import SwiftUI
 		if parentCoordinator.bottomSheetCoordinator === self { parentCoordinator.bottomSheetCoordinator = nil }
 	}
 
+	// the nearest enclosing context that can host a bottom sheet: bottom sheets
+	// never stack on bottom sheets, so those defer to their parent
+	var bottomSheetHost: HarmonyCoordinator<Screen> {
+		action == .bottomSheet ? (parentCoordinator?.bottomSheetHost ?? self) : self
+	}
+
 	func addChild(_ screen: Screen, configuration: HarmonyNavigationConfiguration) {
 		let new = HarmonyCoordinator([screen])
 		new.configuration = configuration
-		new.parentCoordinator = self
 
 		if configuration.action == .bottomSheet {
-			bottomSheetCoordinator = new
+			let host = bottomSheetHost
+			new.parentCoordinator = host
+			host.bottomSheetCoordinator = new
 		} else {
+			new.parentCoordinator = self
 			modalCoordinator = new
 		}
 	}
