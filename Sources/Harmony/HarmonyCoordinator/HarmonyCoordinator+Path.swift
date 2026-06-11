@@ -12,15 +12,11 @@ extension HarmonyCoordinator {
 		_screens.map(\.screen)
 	}
 	
-	var navigationPathBinding: Binding<NavigationPath> {
+	var pathBinding: Binding<[Screen]> {
 		Binding(get: {
-			return NavigationPath(self.fullPath)
+			self.fullPath
 		}, set: { newPath in
-			var navPath = self.fullPath
-			while newPath.count < navPath.count {
-				navPath.removeLast()
-				self._screens.removeLast()
-			}
+			self._screens = newPath.map { ScreenAction(screen: $0, action: .push) }
 		})
 	}
 }

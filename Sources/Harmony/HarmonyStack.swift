@@ -22,17 +22,25 @@ public struct HarmonyStack<Screen: HarmonyScreen>: View {
 	var config: HarmonyCoordinator<Screen>.ScreenConfiguration { .init(coordinator: coordinator) }
 	
 	public var body: some View {
-		NavigationStack(path: coordinator.navigationPathBinding) {
-			VStack {
-				coordinator.root.body(configuration: config)
+		NavigationStack(path: coordinator.pathBinding) {
+			coordinator.root.body(configuration: config)
+				.navigationDestination(for: Screen.self) { screen in
+					screen.body(configuration: config)
+				}
+		}
+		#if os(iOS)
+			.sheet(item: $coordinator.sheetCoordinator) { sheet in
+				HarmonyStack(sheet)
+					.presentationDetents(sheet.action.detents)
 			}
+			.fullScreenCover(item: $coordinator.fullScreenCoordinator) { cover in
+				HarmonyStack(cover)
+			}
+		#else
 			.sheet(item: $coordinator.sheetCoordinator) { sheet in
 				HarmonyStack(sheet)
 			}
-			.navigationDestination(for: Screen.self) { screen in
-				screen.body(configuration: config)
-			}
-		}
+		#endif
 	}
 }
 

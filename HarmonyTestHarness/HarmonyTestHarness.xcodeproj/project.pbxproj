@@ -101,7 +101,7 @@
 			mainGroup = B59E70372FD8AA5200D60A84;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				B59E70542FD8AABD00D60A84 /* XCLocalSwiftPackageReference "../../../../Harmony" */,
+				B59E70542FD8AABD00D60A84 /* XCLocalSwiftPackageReference "../../Harmony" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B59E70412FD8AA5200D60A84 /* Products */;
@@ -343,9 +343,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		B59E70542FD8AABD00D60A84 /* XCLocalSwiftPackageReference "../../../../Harmony" */ = {
+		B59E70542FD8AABD00D60A84 /* XCLocalSwiftPackageReference "../../Harmony" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../Harmony;
+			relativePath = ../../Harmony;
 		};
 /* End XCLocalSwiftPackageReference section */
 

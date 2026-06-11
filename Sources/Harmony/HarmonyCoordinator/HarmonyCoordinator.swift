@@ -15,13 +15,14 @@ import SwiftUI
 	var root: Screen
 	var action = HarmonyAction.push
 	
-	nonisolated public var id: String { "\(self)" }
+	nonisolated public var id: ObjectIdentifier { ObjectIdentifier(self) }
 	
 	public init(_ screen: Screen) {
 		root = screen
 	}
 	
 	public init(_ path: [Screen]) {
+		precondition(!path.isEmpty, "HarmonyCoordinator requires at least one screen")
 		root = path[0]
 		_screens = path.dropFirst().map { ScreenAction(screen: $0, action: .push) }
 	}
@@ -47,17 +48,21 @@ import SwiftUI
 			return childCoordinator
 		}
 		set {
-			childCoordinator = nil
+			if newValue == nil, childCoordinator?.action.isSheet == true { childCoordinator = nil }
 		}
 	}
-	
+
 	var fullScreenCoordinator: HarmonyCoordinator<Screen>? {
 		get {
-			guard let childCoordinator, childCoordinator.action == .fullScreenModal else { return nil }
-			return childCoordinator
+			#if os(macOS)
+				return nil
+			#else
+				guard let childCoordinator, childCoordinator.action == .fullScreenModal else { return nil }
+				return childCoordinator
+			#endif
 		}
 		set {
-			childCoordinator = nil
+			if newValue == nil, childCoordinator?.action == .fullScreenModal { childCoordinator = nil }
 		}
 	}
 }

@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ios-tooling/chronicle", from: "0.0.29"),
-        .package(url: "https://github.com/ios-tooling/suite", from: "1.4.11"),
+        .package(url: "https://github.com/ios-tooling/suite", from: "1.4.12"),
     ],
     targets: [
         .target(
@@ -27,7 +27,7 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "Tests",
+            name: "HarmonyTests",
             dependencies: ["Harmony"]
         ),
     ]
