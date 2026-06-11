@@ -133,7 +133,7 @@ struct HarmonyCoordinatorTests {
 		#expect(coordinator.fullScreenCoordinator != nil)
 		#else
 		// on macOS fullScreenModal presents as a sheet, so the sheet binding owns its dismissal
-		#expect(coordinator.childCoordinator == nil)
+		#expect(coordinator.modalCoordinator == nil)
 		#endif
 	}
 
@@ -143,4 +143,44 @@ struct HarmonyCoordinatorTests {
 		coordinator.fullScreenCoordinator = nil
 		#expect(coordinator.sheetCoordinator != nil)
 	}
+
+	@Test func bottomSheetPersistsUnderModal() {
+		// a bottom sheet is a persistent layer; presenting a modal must not destroy it
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.bottomSheet(.detail)
+		parent.partialModal(.settings)
+		#expect(parent.bottomSheetCoordinator?.root == .detail)
+		#expect(parent.sheetCoordinator?.root == .settings)
+	}
+
+	@Test func modalDismissalRevealsBottomSheet() {
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.bottomSheet(.detail)
+		parent.partialModal(.settings)
+		parent.sheetCoordinator = nil
+		#expect(parent.bottomSheetCoordinator?.root == .detail)
+		#expect(parent.sheetCoordinator?.root == .detail)
+	}
+
+	@Test func dismissStackClearsOnlyItsOwnSlot() {
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.bottomSheet(.detail)
+		parent.partialModal(.settings)
+		parent.bottomSheetCoordinator?.dismissStack()
+		#expect(parent.bottomSheetCoordinator == nil)
+		#expect(parent.sheetCoordinator?.root == .settings)
+	}
+
+	#if os(iOS)
+	@Test func fullScreenModalSuppressesBottomSheetPresentation() {
+		// sheet(item:) and fullScreenCover(item:) can't present simultaneously from one
+		// view; while a cover is up the sheet binding must stay nil — but the bottom
+		// sheet itself survives for when the cover dismisses
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.bottomSheet(.detail)
+		parent.fullScreenModal(.settings)
+		#expect(parent.sheetCoordinator == nil)
+		#expect(parent.bottomSheetCoordinator != nil)
+	}
+	#endif
 }

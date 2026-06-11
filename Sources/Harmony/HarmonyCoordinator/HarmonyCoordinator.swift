@@ -11,7 +11,8 @@ import SwiftUI
 	var _screens: [ScreenAction] = []
 	
 	var parentCoordinator: HarmonyCoordinator<Screen>?
-	var childCoordinator: HarmonyCoordinator<Screen>?
+	var modalCoordinator: HarmonyCoordinator<Screen>?
+	var bottomSheetCoordinator: HarmonyCoordinator<Screen>?
 	var root: Screen
 	var configuration = HarmonyNavigationConfiguration(action: .push)
 
@@ -31,25 +32,37 @@ import SwiftUI
 	
 	func removeFromParentCoordinator() {
 		guard let parentCoordinator else { return }
-		
-		parentCoordinator.childCoordinator = nil
+
+		if parentCoordinator.modalCoordinator === self { parentCoordinator.modalCoordinator = nil }
+		if parentCoordinator.bottomSheetCoordinator === self { parentCoordinator.bottomSheetCoordinator = nil }
 	}
-	
+
 	func addChild(_ screen: Screen, configuration: HarmonyNavigationConfiguration) {
 		let new = HarmonyCoordinator([screen])
 		new.configuration = configuration
-
-		childCoordinator = new
 		new.parentCoordinator = self
+
+		if configuration.action == .bottomSheet {
+			bottomSheetCoordinator = new
+		} else {
+			modalCoordinator = new
+		}
 	}
-	
+
+	// transitional: bottom sheets still present as system sheets until the overlay pass,
+	// so this vends the modal child first, then any bottom sheet — never both
 	var sheetCoordinator: HarmonyCoordinator<Screen>? {
 		get {
-			guard let childCoordinator, childCoordinator.action.isSheet else { return nil }
-			return childCoordinator
+			if let modalCoordinator { return modalCoordinator.action.isSheet ? modalCoordinator : nil }
+			return bottomSheetCoordinator
 		}
 		set {
-			if newValue == nil, childCoordinator?.action.isSheet == true { childCoordinator = nil }
+			guard newValue == nil else { return }
+			if let modalCoordinator {
+				if modalCoordinator.action.isSheet { self.modalCoordinator = nil }
+			} else {
+				bottomSheetCoordinator = nil
+			}
 		}
 	}
 
@@ -58,12 +71,12 @@ import SwiftUI
 			#if os(macOS)
 				return nil
 			#else
-				guard let childCoordinator, childCoordinator.action == .fullScreenModal else { return nil }
-				return childCoordinator
+				guard let modalCoordinator, modalCoordinator.action == .fullScreenModal else { return nil }
+				return modalCoordinator
 			#endif
 		}
 		set {
-			if newValue == nil, childCoordinator?.action == .fullScreenModal { childCoordinator = nil }
+			if newValue == nil, modalCoordinator?.action == .fullScreenModal { modalCoordinator = nil }
 		}
 	}
 }
