@@ -16,7 +16,7 @@ extension HarmonyCoordinator {
 			_screens.append(.init(screen: screen, action: action))
 
 		case .bottomSheet, .partialModal, .fullScreenModal:
-			addChild(screen, action: config.action)
+			addChild(screen, configuration: config)
 		}
 	}
 	

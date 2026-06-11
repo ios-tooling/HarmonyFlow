@@ -75,6 +75,29 @@ struct HarmonyCoordinatorTests {
 		#expect(coordinator.fullPath.isEmpty)
 	}
 
+	@Test func presentationConfigIsStoredOnPresentedCoordinator() {
+		// per-screen presentation options must survive to the child coordinator,
+		// where HarmonyStack reads them at presentation time
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.show(.settings, config: .init(action: .partialModal, detents: [.fraction(0.75)], isInteractiveDismissDisabled: true))
+		#expect(parent.sheetCoordinator?.configuration.detents == [.fraction(0.75)])
+		#expect(parent.sheetCoordinator?.configuration.isInteractiveDismissDisabled == true)
+	}
+
+	#if os(iOS)
+	@Test func detentsFallBackToActionDefaultsWhenUnspecified() {
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.partialModal(.settings)
+		#expect(parent.sheetCoordinator?.presentationDetents == [.medium])
+	}
+
+	@Test func customDetentsOverrideActionDefaults() {
+		let parent = HarmonyCoordinator(TestScreen.home)
+		parent.show(.settings, config: .init(action: .partialModal, detents: [.height(200), .large]))
+		#expect(parent.sheetCoordinator?.presentationDetents == [.height(200), .large])
+	}
+	#endif
+
 	@Test func dismissStackRemovesWholePresentedStack() {
 		// a screen deep inside a presented flow can close the entire flow,
 		// without knowing how it was presented

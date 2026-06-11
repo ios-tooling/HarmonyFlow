@@ -13,7 +13,9 @@ import SwiftUI
 	var parentCoordinator: HarmonyCoordinator<Screen>?
 	var childCoordinator: HarmonyCoordinator<Screen>?
 	var root: Screen
-	var action = HarmonyAction.push
+	var configuration = HarmonyNavigationConfiguration(action: .push)
+
+	var action: HarmonyAction { configuration.action }
 	
 	nonisolated public var id: ObjectIdentifier { ObjectIdentifier(self) }
 	
@@ -33,13 +35,12 @@ import SwiftUI
 		parentCoordinator.childCoordinator = nil
 	}
 	
-	func addChild(_ screen: Screen, action: HarmonyAction) {
+	func addChild(_ screen: Screen, configuration: HarmonyNavigationConfiguration) {
 		let new = HarmonyCoordinator([screen])
-		new.action = action
-		
+		new.configuration = configuration
+
 		childCoordinator = new
 		new.parentCoordinator = self
-		
 	}
 	
 	var sheetCoordinator: HarmonyCoordinator<Screen>? {

@@ -32,7 +32,8 @@ public struct HarmonyStack<Screen: HarmonyScreen>: View {
 		#if os(iOS)
 			.sheet(item: $coordinator.sheetCoordinator) { sheet in
 				HarmonyStack(sheet)
-					.presentationDetents(sheet.action.detents)
+					.presentationDetents(sheet.presentationDetents)
+					.interactiveDismissDisabled(sheet.configuration.isInteractiveDismissDisabled)
 			}
 			.fullScreenCover(item: $coordinator.fullScreenCoordinator) { cover in
 				HarmonyStack(cover)
@@ -40,6 +41,7 @@ public struct HarmonyStack<Screen: HarmonyScreen>: View {
 		#else
 			.sheet(item: $coordinator.sheetCoordinator) { sheet in
 				HarmonyStack(sheet)
+					.interactiveDismissDisabled(sheet.configuration.isInteractiveDismissDisabled)
 			}
 		#endif
 	}

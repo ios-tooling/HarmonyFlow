@@ -10,9 +10,13 @@ import Foundation
 public struct HarmonyNavigationConfiguration {
     public var action: HarmonyAction
     public var priority: Double
-    
-    public init(action: HarmonyAction, priority: Double = 0.5) {
+    public var detents: Set<HarmonyDetent>?
+    public var isInteractiveDismissDisabled: Bool
+
+    public init(action: HarmonyAction, priority: Double = 0.5, detents: Set<HarmonyDetent>? = nil, isInteractiveDismissDisabled: Bool = false) {
         self.action = action
         self.priority = priority
+        self.detents = detents
+        self.isInteractiveDismissDisabled = isInteractiveDismissDisabled
     }
 }
