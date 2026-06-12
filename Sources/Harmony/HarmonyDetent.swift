@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum HarmonyDetent: Hashable, Sendable {
+public enum HarmonyDetent: Hashable, Sendable, Codable {
 	case medium
 	case large
 	case fraction(Double)

@@ -41,6 +41,11 @@ extension HarmonyCoordinator {
 		_screens.removeAll()
 	}
 
+	// deep-link entry point: swaps the entire pushed path in one step
+	public func replacePath(_ path: [Screen]) {
+		_screens = path.map { ScreenAction(screen: $0, action: .push) }
+	}
+
 	// pops back to the most recent occurrence of the screen; popping to the root
 	// screen clears the path, and a screen not in the stack is a no-op
 	public func pop(to screen: Screen) {

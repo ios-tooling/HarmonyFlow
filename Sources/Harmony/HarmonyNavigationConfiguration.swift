@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct HarmonyNavigationConfiguration {
+public struct HarmonyNavigationConfiguration: Codable {
     public var action: HarmonyAction
     public var detents: Set<HarmonyDetent>?
     public var isInteractiveDismissDisabled: Bool

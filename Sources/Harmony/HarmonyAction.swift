@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum HarmonyAction: Hashable, Equatable {
+public enum HarmonyAction: Hashable, Equatable, Codable {
 	case push        			   // navigation stack
 	case bottomSheet		      // presentation modal
 	case partialModal          // presentation modal

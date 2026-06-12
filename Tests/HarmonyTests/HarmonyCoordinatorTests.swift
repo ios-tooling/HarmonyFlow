@@ -9,7 +9,7 @@ import Testing
 import SwiftUI
 @testable import Harmony
 
-enum TestScreen: String, HarmonyScreen {
+enum TestScreen: String, HarmonyScreen, Codable {
 	case home, detail, settings
 
 	var id: String { rawValue }
