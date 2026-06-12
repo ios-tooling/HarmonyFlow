@@ -59,6 +59,8 @@ enum Screen: HarmonyScreen {
 				ToggleTabBarButton()
 
 				PresentResultButton()
+
+				ShowDetailButton()
 			}
 			.navigationTitle("Main")
 

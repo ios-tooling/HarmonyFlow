@@ -9,11 +9,13 @@ import SwiftUI
 import Harmony
 
 struct ToggleTabBarButton: View {
-	@Environment(HarmonyTabCoordinator<AppTab>.self) private var tabs
+	@Environment(HarmonyTabCoordinator<AppTab>.self) private var tabs: HarmonyTabCoordinator<AppTab>?
 
 	var body: some View {
-		Button(tabs.isTabBarHidden ? "Show Tab Bar" : "Hide Tab Bar") {
-			tabs.isTabBarHidden.toggle()
+		if let tabs {
+			Button(tabs.isTabBarHidden ? "Show Tab Bar" : "Hide Tab Bar") {
+				tabs.isTabBarHidden.toggle()
+			}
 		}
 	}
 }

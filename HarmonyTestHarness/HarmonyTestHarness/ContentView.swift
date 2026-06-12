@@ -9,10 +9,24 @@ import SwiftUI
 import Harmony
 
 struct ContentView: View {
-	@State private var coordinator = HarmonyTabCoordinator(selected: AppTab.home)
+	@AppStorage("useSplitRoot") private var useSplitRoot = false
+	@State private var tabs = HarmonyTabCoordinator(selected: AppTab.home)
+	@State private var split = HarmonySplitCoordinator(sidebar: Screen.main, detail: .settings)
 
 	var body: some View {
-		HarmonyTabs(coordinator)
+		Group {
+			if useSplitRoot {
+				HarmonySplit(split)
+			} else {
+				HarmonyTabs(tabs)
+			}
+		}
+		.safeAreaInset(edge: .bottom) {
+			Toggle("Split View Root", isOn: $useSplitRoot)
+				.padding(.horizontal)
+				.padding(.vertical, 8)
+				.background(.bar)
+		}
 	}
 }
 
