@@ -9,7 +9,7 @@ import Testing
 import SwiftUI
 @testable import Harmony
 
-enum TestTab: String, HarmonyTab {
+enum TestTab: String, HarmonyTab, Codable {
 	case home, profile
 
 	var rootScreen: TestScreen {

@@ -13,7 +13,7 @@ import SwiftUI
 	var bottomSheetCoordinator: HarmonyCoordinator<Tab.Screen>? {
 		didSet { if oldValue !== bottomSheetCoordinator { oldValue?.resolvePendingPresentation() } }
 	}
-	private var stacks: [Tab: HarmonyCoordinator<Tab.Screen>] = [:]
+	var stacks: [Tab: HarmonyCoordinator<Tab.Screen>] = [:]
 
 	public init(selected: Tab) {
 		selectedTab = selected

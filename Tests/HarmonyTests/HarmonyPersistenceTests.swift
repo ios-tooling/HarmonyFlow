@@ -45,4 +45,38 @@ struct HarmonyPersistenceTests {
 		coordinator.replacePath([.settings, .detail, .settings])
 		#expect(coordinator.fullPath == [.settings, .detail, .settings])
 	}
+
+	@Test func tabStateRoundTrips() throws {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.profile)
+		tabs.isTabBarHidden = true
+		tabs.coordinator(for: .home).push(.detail)
+
+		let restored = try HarmonyTabCoordinator<TestTab>(restoring: tabs.encodedState())
+		#expect(restored.selectedTab == .profile)
+		#expect(restored.isTabBarHidden)
+		#expect(restored.coordinator(for: .home).fullPath == [.detail])
+		#expect(restored.coordinator(for: .profile).fullPath.isEmpty)
+	}
+
+	@Test func tabLevelBottomSheetRoundTripsWithWorkingHostLinks() throws {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		tabs.coordinator(for: .home).bottomSheet(.detail)
+
+		let restored = try HarmonyTabCoordinator<TestTab>(restoring: tabs.encodedState())
+		#expect(restored.bottomSheetCoordinator?.root == .detail)
+		restored.bottomSheetCoordinator?.dismissStack()
+		#expect(restored.bottomSheetCoordinator == nil)
+	}
+
+	@Test func splitStateRoundTrips() throws {
+		let split = HarmonySplitCoordinator(sidebar: TestScreen.home, content: .detail, detail: .settings)
+		split.sidebarCoordinator.push(.settings)
+		split.detailCoordinator.push(.detail)
+
+		let restored = try HarmonySplitCoordinator<TestScreen>(restoring: split.encodedState())
+		#expect(restored.sidebarCoordinator.fullPath == [.settings])
+		#expect(restored.contentCoordinator?.root == .detail)
+		#expect(restored.detailCoordinator.root == .settings)
+		#expect(restored.detailCoordinator.fullPath == [.detail])
+	}
 }

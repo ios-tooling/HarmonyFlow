@@ -9,9 +9,9 @@ import SwiftUI
 
 @MainActor @Observable public class HarmonySplitCoordinator<Screen: HarmonyScreen> {
 	public var columnVisibility: NavigationSplitViewVisibility = .automatic
-	public private(set) var sidebarCoordinator: HarmonyCoordinator<Screen>
-	public private(set) var contentCoordinator: HarmonyCoordinator<Screen>?
-	public private(set) var detailCoordinator: HarmonyCoordinator<Screen>
+	public internal(set) var sidebarCoordinator: HarmonyCoordinator<Screen>
+	public internal(set) var contentCoordinator: HarmonyCoordinator<Screen>?
+	public internal(set) var detailCoordinator: HarmonyCoordinator<Screen>
 
 	public init(sidebar: Screen, content: Screen? = nil, detail: Screen) {
 		sidebarCoordinator = HarmonyCoordinator(sidebar)
