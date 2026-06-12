@@ -10,7 +10,9 @@ import SwiftUI
 @MainActor @Observable public class HarmonyTabCoordinator<Tab: HarmonyTab>: HarmonyBottomSheetHosting {
 	public var selectedTab: Tab
 	public var isTabBarHidden = false
-	var bottomSheetCoordinator: HarmonyCoordinator<Tab.Screen>?
+	var bottomSheetCoordinator: HarmonyCoordinator<Tab.Screen>? {
+		didSet { if oldValue !== bottomSheetCoordinator { oldValue?.resolvePendingPresentation() } }
+	}
 	private var stacks: [Tab: HarmonyCoordinator<Tab.Screen>] = [:]
 
 	public init(selected: Tab) {

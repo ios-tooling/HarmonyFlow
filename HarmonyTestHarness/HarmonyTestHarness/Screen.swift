@@ -8,12 +8,18 @@
 import SwiftUI
 import Harmony
 
-enum Screen: String, HarmonyScreen {
-	case main, settings
+enum Screen: HarmonyScreen {
+	case main, settings, titled(String)
 	
-	var id: String { rawValue }
+	var id: String {
+		switch self {
+		case .main: "main"
+		case .settings: "settings"
+		case .titled(let title): "titled.\(title)"
+		}
+	}
 	func hash(into hasher: inout Hasher) {
-		hasher.combine(rawValue)
+		hasher.combine(id)
 	}
 	
 	func body(configuration: HarmonyCoordinator<Self>.ScreenConfiguration) -> some View {
@@ -42,11 +48,17 @@ enum Screen: String, HarmonyScreen {
 					configuration.coordinator.show(.settings, config: .init(action: .partialModal, detents: [.fraction(0.75), .large], isInteractiveDismissDisabled: true))
 				}
 
+				Button("Push Titled") {
+					configuration.coordinator.push(.titled("Titled"))
+				}
+
 				CloseFlowButton()
 
 				SettingsTabButton()
 
 				ToggleTabBarButton()
+
+				PresentResultButton()
 			}
 			.navigationTitle("Main")
 
@@ -57,12 +69,33 @@ enum Screen: String, HarmonyScreen {
 				Button("Dismiss") {
 					configuration.coordinator.dismiss()
 				}
+				Button("Finish with 🎁") {
+					configuration.coordinator.finish(returning: "🎁")
+				}
 				Button("main") {
 					configuration.coordinator.push(.main)
 				}
 
 			}
 			.navigationTitle("Settings")
+			
+		case .titled(let title):
+			VStack {
+				Text(title)
+
+				Button("Dismiss") {
+					configuration.coordinator.dismiss()
+				}
+				Button("Push + 1") {
+					configuration.coordinator.push(.titled("\(title) + 1"))
+				}
+				Button("main") {
+					configuration.coordinator.pop(to: .main)
+				}
+
+			}
+			.navigationTitle(title)
 		}
+		
 	}
 }

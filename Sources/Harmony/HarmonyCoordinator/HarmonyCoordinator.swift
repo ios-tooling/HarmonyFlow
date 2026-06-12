@@ -11,8 +11,17 @@ import SwiftUI
 	var _screens: [ScreenAction] = []
 
 	var parentCoordinator: HarmonyCoordinator<Screen>?
-	var modalCoordinator: HarmonyCoordinator<Screen>?
-	var bottomSheetCoordinator: HarmonyCoordinator<Screen>?
+	var modalCoordinator: HarmonyCoordinator<Screen>? {
+		didSet { if oldValue !== modalCoordinator { oldValue?.resolvePendingPresentation() } }
+	}
+	var bottomSheetCoordinator: HarmonyCoordinator<Screen>? {
+		didSet { if oldValue !== bottomSheetCoordinator { oldValue?.resolvePendingPresentation() } }
+	}
+
+	// presentation-result plumbing: the slot didSets above guarantee exactly-once
+	// resolution however the presentation ends
+	@ObservationIgnored var pendingPresentationContinuation: CheckedContinuation<(any Sendable)?, Never>?
+	@ObservationIgnored var pendingPresentationResult: (any Sendable)?
 
 	// when set (e.g. by a tab coordinator), bottom sheets presented here are hosted
 	// there instead, so they can render above container chrome like the tab bar
@@ -52,7 +61,7 @@ import SwiftUI
 		action == .bottomSheet ? (parentCoordinator?.bottomSheetHost ?? self) : self
 	}
 
-	func addChild(_ screen: Screen, configuration: HarmonyNavigationConfiguration) {
+	@discardableResult func addChild(_ screen: Screen, configuration: HarmonyNavigationConfiguration) -> HarmonyCoordinator<Screen> {
 		let new = HarmonyCoordinator([screen])
 		new.configuration = configuration
 
@@ -70,6 +79,13 @@ import SwiftUI
 			new.parentCoordinator = self
 			modalCoordinator = new
 		}
+		return new
+	}
+
+	func resolvePendingPresentation() {
+		pendingPresentationContinuation?.resume(returning: pendingPresentationResult)
+		pendingPresentationContinuation = nil
+		pendingPresentationResult = nil
 	}
 
 	var sheetCoordinator: HarmonyCoordinator<Screen>? {

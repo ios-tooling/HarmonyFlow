@@ -12,8 +12,8 @@ struct SettingsTabButton: View {
 	@Environment(HarmonyTabCoordinator<AppTab>.self) private var tabs
 
 	var body: some View {
-		Button("Settings Tab → main") {
-			tabs.show(.main, in: .settings)
+		Button("Titled Tab → main") {
+			tabs.show(.titled("Subtitled"), in: .settings)
 		}
 	}
 }
