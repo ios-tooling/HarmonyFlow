@@ -3,15 +3,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "Harmony",
+    name: "HarmonyFlow",
     platforms: [
         .iOS(.v18),
         .macOS(.v15),
     ],
     products: [
         .library(
-            name: "Harmony",
-            targets: ["Harmony"]
+            name: "HarmonyFlow",
+            targets: ["HarmonyFlow"]
         ),
     ],
     dependencies: [
@@ -20,15 +20,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Harmony",
+            name: "HarmonyFlow",
             dependencies: [
                 .product(name: "Chronicle", package: "chronicle"),
                 .product(name: "Suite", package: "suite"),
             ]
         ),
         .testTarget(
-            name: "HarmonyTests",
-            dependencies: ["Harmony"]
+            name: "HarmonyFlowTests",
+            dependencies: ["HarmonyFlow"]
         ),
     ]
 )

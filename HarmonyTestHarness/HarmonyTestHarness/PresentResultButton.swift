@@ -1,12 +1,12 @@
 //
 //  PresentResultButton.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/11/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 struct PresentResultButton: View {
 	@Environment(HarmonyCoordinator<Screen>.self) private var coordinator

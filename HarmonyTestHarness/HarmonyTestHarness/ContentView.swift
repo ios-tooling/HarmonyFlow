@@ -1,12 +1,12 @@
 //
 //  ContentView.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/9/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 struct ContentView: View {
 	@AppStorage("useSplitRoot") private var useSplitRoot = false

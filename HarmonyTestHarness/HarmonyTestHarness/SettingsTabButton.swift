@@ -1,12 +1,12 @@
 //
 //  SettingsTabButton.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/11/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 struct SettingsTabButton: View {
 	@Environment(HarmonyTabCoordinator<AppTab>.self) private var tabs: HarmonyTabCoordinator<AppTab>?

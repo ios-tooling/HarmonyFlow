@@ -1,0 +1,114 @@
+//
+//  HarmonyFlowCoordinator.swift
+//  HarmonyFlow
+//
+//  Created by Ben Gottlieb on 6/9/26.
+//
+
+import SwiftUI
+
+@MainActor @Observable public class HarmonyCoordinator<Screen: HarmonyScreen>: Identifiable, HarmonyBottomSheetHosting {
+	var _screens: [ScreenAction] = []
+
+	var parentCoordinator: HarmonyCoordinator<Screen>?
+	var modalCoordinator: HarmonyCoordinator<Screen>? {
+		didSet { if oldValue !== modalCoordinator { oldValue?.resolvePendingPresentation() } }
+	}
+	var bottomSheetCoordinator: HarmonyCoordinator<Screen>? {
+		didSet { if oldValue !== bottomSheetCoordinator { oldValue?.resolvePendingPresentation() } }
+	}
+
+	// presentation-result plumbing: the slot didSets above guarantee exactly-once
+	// resolution however the presentation ends
+	@ObservationIgnored var pendingPresentationContinuation: CheckedContinuation<(any Sendable)?, Never>?
+	@ObservationIgnored var pendingPresentationResult: (any Sendable)?
+
+	// when set (e.g. by a tab coordinator), bottom sheets presented here are hosted
+	// there instead, so they can render above container chrome like the tab bar
+	@ObservationIgnored weak var externalBottomSheetHost: (any HarmonyBottomSheetHosting<Screen>)?
+	var root: Screen
+	var configuration = HarmonyNavigationConfiguration(action: .push)
+
+	var action: HarmonyAction { configuration.action }
+	
+	nonisolated public var id: ObjectIdentifier { ObjectIdentifier(self) }
+	
+	public init(_ screen: Screen) {
+		root = screen
+	}
+	
+	public init(_ path: [Screen]) {
+		precondition(!path.isEmpty, "HarmonyCoordinator requires at least one screen")
+		root = path[0]
+		_screens = path.dropFirst().map { ScreenAction(screen: $0, action: .push) }
+	}
+	
+	func removeFromParentCoordinator() {
+		if let externalBottomSheetHost {
+			if externalBottomSheetHost.bottomSheetCoordinator === self { externalBottomSheetHost.bottomSheetCoordinator = nil }
+			return
+		}
+
+		guard let parentCoordinator else { return }
+
+		if parentCoordinator.modalCoordinator === self { parentCoordinator.modalCoordinator = nil }
+		if parentCoordinator.bottomSheetCoordinator === self { parentCoordinator.bottomSheetCoordinator = nil }
+	}
+
+	// the nearest enclosing context that can host a bottom sheet: bottom sheets
+	// never stack on bottom sheets, so those defer to their parent
+	var bottomSheetHost: HarmonyCoordinator<Screen> {
+		action == .bottomSheet ? (parentCoordinator?.bottomSheetHost ?? self) : self
+	}
+
+	@discardableResult func addChild(_ screen: Screen, configuration: HarmonyNavigationConfiguration) -> HarmonyCoordinator<Screen> {
+		let new = HarmonyCoordinator([screen])
+		new.configuration = configuration
+
+		if configuration.action == .bottomSheet {
+			let host = bottomSheetHost
+			new.parentCoordinator = host
+
+			if let external = host.externalBottomSheetHost {
+				new.externalBottomSheetHost = external
+				external.bottomSheetCoordinator = new
+			} else {
+				host.bottomSheetCoordinator = new
+			}
+		} else {
+			new.parentCoordinator = self
+			modalCoordinator = new
+		}
+		return new
+	}
+
+	func resolvePendingPresentation() {
+		pendingPresentationContinuation?.resume(returning: pendingPresentationResult)
+		pendingPresentationContinuation = nil
+		pendingPresentationResult = nil
+	}
+
+	var sheetCoordinator: HarmonyCoordinator<Screen>? {
+		get {
+			guard let modalCoordinator, modalCoordinator.action.isSheet else { return nil }
+			return modalCoordinator
+		}
+		set {
+			if newValue == nil, modalCoordinator?.action.isSheet == true { modalCoordinator = nil }
+		}
+	}
+
+	var fullScreenCoordinator: HarmonyCoordinator<Screen>? {
+		get {
+			#if os(macOS)
+				return nil
+			#else
+				guard let modalCoordinator, modalCoordinator.action == .fullScreenModal else { return nil }
+				return modalCoordinator
+			#endif
+		}
+		set {
+			if newValue == nil, modalCoordinator?.action == .fullScreenModal { modalCoordinator = nil }
+		}
+	}
+}

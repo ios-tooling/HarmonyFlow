@@ -1,12 +1,12 @@
 //
 //  CloseFlowButton.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/10/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 struct CloseFlowButton: View {
 	@Environment(HarmonyCoordinator<Screen>.self) private var coordinator

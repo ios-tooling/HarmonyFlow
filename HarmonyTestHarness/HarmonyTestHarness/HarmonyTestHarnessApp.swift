@@ -1,6 +1,6 @@
 //
-//  HarmonyTestHarnessApp.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarnessApp.swift
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/9/26.
 //

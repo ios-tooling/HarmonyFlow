@@ -1,12 +1,12 @@
 //
 //  AppTab.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/11/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 enum AppTab: String, HarmonyTab {
 	case home, settings

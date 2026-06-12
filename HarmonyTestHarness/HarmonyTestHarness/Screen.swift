@@ -1,12 +1,12 @@
 //
 //  Screen.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/9/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 enum Screen: HarmonyScreen {
 	case main, settings, titled(String)

@@ -1,12 +1,12 @@
 //
 //  ShowDetailButton.swift
-//  HarmonyTestHarness
+//  HarmonyFlowTestHarness
 //
 //  Created by Ben Gottlieb on 6/11/26.
 //
 
 import SwiftUI
-import Harmony
+import HarmonyFlow
 
 struct ShowDetailButton: View {
 	@Environment(HarmonySplitCoordinator<Screen>.self) private var split: HarmonySplitCoordinator<Screen>?
