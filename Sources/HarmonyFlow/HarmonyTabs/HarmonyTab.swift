@@ -12,5 +12,5 @@ public protocol HarmonyTab: Hashable, CaseIterable {
 	associatedtype TabLabel: View
 
 	var rootScreen: Screen { get }
-	@ViewBuilder var label: TabLabel { get }
+	@MainActor @ViewBuilder var label: TabLabel { get }
 }

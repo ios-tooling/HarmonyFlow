@@ -10,5 +10,5 @@ import SwiftUI
 public protocol HarmonyScreen: Hashable, Identifiable, Equatable {
     associatedtype Body: View
     
-	@ViewBuilder func body(configuration: HarmonyCoordinator<Self>.ScreenConfiguration) -> Body
+	@MainActor @ViewBuilder func body(configuration: HarmonyCoordinator<Self>.ScreenConfiguration) -> Body
 }
