@@ -8,7 +8,7 @@ Unified, coordinator-driven navigation for SwiftUI on iOS and macOS. Each featur
 ## Installation
 
 ```swift
-.package(url: "https://github.com/ios-tooling/HarmonyFlow.git", branch: "main")
+.package(url: "https://github.com/ios-tooling/HarmonyFlow.git", from: "0.2.0")
 ```
 
 ```swift
@@ -17,7 +17,7 @@ Unified, coordinator-driven navigation for SwiftUI on iOS and macOS. Each featur
 ])
 ```
 
-Import it as `import HarmonyFlow`. (No versioned release is tagged yet; pin to a commit if you need stability.)
+Import it as `import HarmonyFlow`. Releases are tagged; use `branch: "main"` to follow unreleased work.
 
 ## The core idea
 
