@@ -29,13 +29,13 @@ struct HarmonySplitCoordinatorTests {
 		split.detailCoordinator.push(TestScreen.settings)
 		split.showDetail(TestScreen.home)
 		#expect(split.detailCoordinator.root == .home)
-		#expect(split.detailCoordinator.fullPath.isEmpty)
+		#expect(split.detailCoordinator.path.isEmpty)
 	}
 
 	@Test func columnsNavigateIndependently() {
 		let split = HarmonySplitCoordinator(sidebar: TestScreen.home, detail: TestScreen.detail)
 		split.sidebarCoordinator.push(TestScreen.settings)
-		#expect(split.detailCoordinator.fullPath.isEmpty)
+		#expect(split.detailCoordinator.path.isEmpty)
 		split.detailCoordinator.partialModal(TestScreen.settings)
 		#expect(split.sidebarCoordinator.modalCoordinator == nil)
 	}

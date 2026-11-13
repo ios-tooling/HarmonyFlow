@@ -88,12 +88,20 @@ coordinator.fullScreenModal(Screen.editor) // full-screen cover (sheet on macOS)
 
 coordinator.dismiss()              // go back one: pop a push, or dismiss a presentation root
 coordinator.dismissStack()         // dismiss the entire presented flow this screen lives in
+coordinator.dismissTopFlow()       // from the presenting side: dismiss only the frontmost presented flow
 coordinator.pop(to: Screen.home)   // pop back to a specific screen
 coordinator.popToRoot()            // pop all pushes
 coordinator.collapse()             // back to a pristine root: pop everything + drop presentations
 ```
 
 `dismiss()` is always "go back one step" — a screen never needs to know *how* it was presented.
+
+### Showing while something is presented
+
+- A presentation belongs to the coordinator it was shown from.
+- `push` on a coordinator that is presenting a modal adds to that coordinator's own path, beneath the modal. Push on `coordinator.topCoordinator` to push inside the presented flow.
+- A coordinator presents one modal at a time, so a second `partialModal` / `fullScreenModal` from the same coordinator replaces the first. Present from the presented flow's coordinator to stack them.
+- A bottom sheet stays up beneath a modal presented from the same coordinator.
 
 ## Per-presentation configuration
 
@@ -158,6 +166,8 @@ Each tab keeps its own navigation stack across switches. Navigate across tabs fr
 ```swift
 tabs.show(Screen.account, in: .settings)   // switch tab, then push
 tabs.collapse()                            // reset the selected tab to its root
+tabs.dismissTopFlow(in: .settings)         // dismiss only the frontmost flow presented in that tab
+tabs.topScreen                             // the frontmost screen, whichever tab presented it
 tabs.isTabBarHidden = true                 // animated hide/show (iOS)
 ```
 
@@ -171,6 +181,27 @@ HarmonySplit(split)
 
 split.showDetail(Screen.account)   // selection-style: replaces the detail column's stack
 ```
+
+## Reading the stack
+
+What a coordinator is showing is readable as values, without encoding its state. The properties are observed, so a view or `withObservationTracking` that reads them updates when the stack changes.
+
+```swift
+coordinator.root                  // the screen at the bottom of the stack
+coordinator.path                  // the screens pushed above the root, bottom to top
+coordinator.presentedModal        // the modal flow's coordinator, if any
+coordinator.presentedBottomSheet  // the bottom sheet's coordinator, if any
+coordinator.topCoordinator        // the coordinator of the frontmost flow
+coordinator.screens               // every screen showing, from the root up
+coordinator.topScreen             // the frontmost screen
+
+if let screen = coordinator.topScreen.destination as? Screen { … }
+
+tabs.topCoordinator               // under tabs: the frontmost flow, whichever tab presented it
+tabs.topScreen                    // … and its top screen
+```
+
+`screens` lists the coordinator's own stack, then its bottom sheet's screens, then its modal's — the order they sit on screen. Under tabs, read one tab through `tabs.coordinator(for: .home).screens` and the frontmost screen across tabs through `tabs.topScreen`: a modal covers every tab, so a tab presenting one comes before the selected tab. A tab's bottom sheet is hosted above the tab bar but still reported by the tab that presented it; `tabs.presentedBottomSheet` is that sheet whichever tab presented it. These values are the coordinator's state. The screen follows them, though not instantly, and a presentation UIKit refuses (see Tabs) is listed without being on screen.
 
 ## State persistence & deep linking
 

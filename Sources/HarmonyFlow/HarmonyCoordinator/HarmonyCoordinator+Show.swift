@@ -39,6 +39,15 @@ extension HarmonyCoordinator {
 		removeFromParentCoordinator()
 	}
 
+	/// Dismisses the frontmost flow presented from this coordinator (`topCoordinator`) and nothing else: flows
+	/// beneath it and this coordinator's own pushed screens stay. Returns `false` when nothing is presented.
+	@discardableResult public func dismissTopFlow() -> Bool {
+		let top = topCoordinator
+		guard top !== self else { return false }
+		top.dismissStack()
+		return true
+	}
+
 	public func popToRoot() {
 		_screens.removeAll()
 	}

@@ -27,8 +27,8 @@ struct HarmonyTabCoordinatorTests {
 	@Test func eachTabKeepsItsOwnStack() {
 		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
 		tabs.coordinator(for: .home).push(TestScreen.detail)
-		#expect(tabs.coordinator(for: .home).fullPath == [.detail])
-		#expect(tabs.coordinator(for: .profile).fullPath.isEmpty)
+		#expect(tabs.coordinator(for: .home).path == [.detail])
+		#expect(tabs.coordinator(for: .profile).path.isEmpty)
 	}
 
 	@Test func tabCoordinatorsAreStable() {
@@ -45,7 +45,7 @@ struct HarmonyTabCoordinatorTests {
 		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
 		tabs.show(TestScreen.detail, in: .profile)
 		#expect(tabs.selectedTab == .profile)
-		#expect(tabs.coordinator(for: .profile).fullPath == [.detail])
+		#expect(tabs.coordinator(for: .profile).path == [.detail])
 	}
 
 	@Test func showInTabHonorsPresentationConfig() {
@@ -103,7 +103,7 @@ struct HarmonyTabCoordinatorTests {
 		tabs.coordinator(for: .home).push(TestScreen.detail)
 		tabs.coordinator(for: .home).partialModal(TestScreen.settings)
 		tabs.collapse()
-		#expect(tabs.coordinator(for: .home).fullPath.isEmpty)
+		#expect(tabs.coordinator(for: .home).path.isEmpty)
 		#expect(tabs.coordinator(for: .home).modalCoordinator == nil)
 	}
 
@@ -112,8 +112,8 @@ struct HarmonyTabCoordinatorTests {
 		tabs.coordinator(for: .profile).push(TestScreen.detail)
 		tabs.coordinator(for: .home).push(TestScreen.detail)
 		tabs.collapse(.home)
-		#expect(tabs.coordinator(for: .home).fullPath.isEmpty)
-		#expect(tabs.coordinator(for: .profile).fullPath == [.detail])
+		#expect(tabs.coordinator(for: .home).path.isEmpty)
+		#expect(tabs.coordinator(for: .profile).path == [.detail])
 	}
 
 	@Test func plainCoordinatorsHostTheirOwnBottomSheets() {

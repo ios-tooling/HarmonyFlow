@@ -8,13 +8,14 @@
 import SwiftUI
 
 extension HarmonyCoordinator {
-	var fullPath: [HarmonyScreen] {
+	/// The screens pushed above `root`, bottom to top; does not include `root`.
+	public var path: [HarmonyScreen] {
 		_screens.map(\.screen)
 	}
 
 	var pathBinding: Binding<[HarmonyScreen]> {
 		Binding(get: {
-			self.fullPath
+			self.path
 		}, set: { newPath in
 			self._screens = newPath.map { ScreenAction(screen: $0, action: .push) }
 		})

@@ -26,7 +26,8 @@ import SwiftUI
 	// when set (e.g. by a tab coordinator), bottom sheets presented here are hosted
 	// there instead, so they can render above container chrome like the tab bar
 	@ObservationIgnored weak var externalBottomSheetHost: (any HarmonyBottomSheetHosting)?
-	var root: HarmonyScreen
+	/// The screen at the bottom of this coordinator's stack.
+	public internal(set) var root: HarmonyScreen
 	var configuration = HarmonyNavigationConfiguration(action: .push)
 
 	var action: HarmonyAction { configuration.action }

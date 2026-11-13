@@ -11,7 +11,8 @@ import SwiftUI
 // box around any framework's HarmonyDestination. AnyHashable supplies cross-module
 // identity (two destinations of different types are never equal)
 public struct HarmonyScreen: Identifiable, Hashable {
-	let destination: any HarmonyDestination
+	/// The wrapped destination; cast it back to its own type to read it (`screen.destination as? Screen`).
+	public let destination: any HarmonyDestination
 
 	public init(_ destination: any HarmonyDestination) { self.destination = destination }
 

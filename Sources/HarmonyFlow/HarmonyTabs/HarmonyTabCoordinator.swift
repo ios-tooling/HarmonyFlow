@@ -31,6 +31,23 @@ import SwiftUI
 		return stack
 	}
 
+	/// The bottom sheet showing above the tab bar, if any, whichever tab presented it.
+	public var presentedBottomSheet: HarmonyCoordinator? { bottomSheetCoordinator }
+
+	/// The coordinator of the frontmost flow on screen.
+	///
+	/// A modal covers the whole window whichever tab presented it, and stays up when another tab is selected in
+	/// code, so a tab presenting a modal comes first (the selected tab, if it is presenting one); then the bottom
+	/// sheet above the tab bar; otherwise the selected tab's own stack.
+	public var topCoordinator: HarmonyCoordinator {
+		let selected = coordinator(for: selectedTab)
+		let modal = selected.presentedModal ?? Tab.allCases.lazy.compactMap { self.coordinator(for: $0).presentedModal }.first
+		return modal?.topCoordinator ?? bottomSheetCoordinator?.topCoordinator ?? selected
+	}
+
+	/// The frontmost screen on screen: the top screen of `topCoordinator`.
+	public var topScreen: HarmonyScreen { topCoordinator.topScreen }
+
 	public func show(_ destination: any HarmonyDestination, in tab: Tab, config: HarmonyNavigationConfiguration = .init(action: .push)) {
 		selectedTab = tab
 		coordinator(for: tab).show(destination, config: config)
@@ -38,5 +55,11 @@ import SwiftUI
 
 	public func collapse(_ tab: Tab? = nil) {
 		coordinator(for: tab ?? selectedTab).collapse()
+	}
+
+	/// Dismisses only the frontmost flow presented in `tab` (the selected tab by default). Unlike `collapse(_:)`,
+	/// the tab's pushed screens and any flows beneath the top one stay. Returns `false` when nothing is presented.
+	@discardableResult public func dismissTopFlow(in tab: Tab? = nil) -> Bool {
+		coordinator(for: tab ?? selectedTab).dismissTopFlow()
 	}
 }

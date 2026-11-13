@@ -22,7 +22,7 @@ extension HarmonyCoordinator {
 	var snapshot: HarmonySnapshot {
 		HarmonySnapshot(
 			root: root,
-			path: fullPath,
+			path: path,
 			configuration: configuration,
 			modal: modalCoordinator.map { [$0.snapshot] } ?? [],
 			bottomSheet: bottomSheetCoordinator.map { [$0.snapshot] } ?? []

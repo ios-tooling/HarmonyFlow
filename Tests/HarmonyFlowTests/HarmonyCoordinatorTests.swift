@@ -40,7 +40,7 @@ struct EnvironmentProbe: View {
 	@Environment(HarmonyCoordinator.self) private var coordinator
 
 	var body: some View {
-		Text("depth \(coordinator.fullPath.count)")
+		Text("depth \(coordinator.path.count)")
 	}
 }
 
@@ -56,20 +56,20 @@ struct HarmonyCoordinatorTests {
 	@Test func pushAppendsToPath() {
 		let coordinator = HarmonyCoordinator(TestScreen.home)
 		coordinator.push(TestScreen.detail)
-		#expect(coordinator.fullPath == [.detail])
+		#expect(coordinator.path == [.detail])
 	}
 
 	@Test func pathBindingRecordsExternalPushes() {
 		// NavigationLink(value:) writes through the binding; the coordinator must not revert it
 		let coordinator = HarmonyCoordinator(TestScreen.home)
 		coordinator.pathBinding.wrappedValue.append(HarmonyScreen(TestScreen.detail))
-		#expect(coordinator.fullPath == [.detail])
+		#expect(coordinator.path == [.detail])
 	}
 
 	@Test func pathBindingPopsScreens() {
 		let coordinator = HarmonyCoordinator([TestScreen.home, .detail, .settings])
 		coordinator.pathBinding.wrappedValue.removeLast()
-		#expect(coordinator.fullPath == [.detail])
+		#expect(coordinator.path == [.detail])
 	}
 
 	@Test func partialModalCreatesSheetChild() {
@@ -77,7 +77,7 @@ struct HarmonyCoordinatorTests {
 		coordinator.partialModal(TestScreen.settings)
 		#expect(coordinator.sheetCoordinator?.root == .settings)
 		#expect(coordinator.fullScreenCoordinator == nil)
-		#expect(coordinator.fullPath.isEmpty)
+		#expect(coordinator.path.isEmpty)
 	}
 
 	@Test func fullScreenModalCreatesFullScreenChild() {
@@ -96,26 +96,26 @@ struct HarmonyCoordinatorTests {
 	@Test func popToScreenDropsEverythingAboveIt() {
 		let coordinator = HarmonyCoordinator([TestScreen.home, .detail, .settings, .detail, .settings])
 		coordinator.pop(to: TestScreen.detail)
-		#expect(coordinator.fullPath == [.detail, .settings, .detail])
+		#expect(coordinator.path == [.detail, .settings, .detail])
 	}
 
 	@Test func popToRootScreenClearsThePath() {
 		let coordinator = HarmonyCoordinator([TestScreen.home, .detail, .settings])
 		coordinator.pop(to: TestScreen.home)
-		#expect(coordinator.fullPath.isEmpty)
+		#expect(coordinator.path.isEmpty)
 	}
 
 	@Test func popToMissingScreenDoesNothing() {
 		let coordinator = HarmonyCoordinator([TestScreen.home, .detail])
 		coordinator.pop(to: TestScreen.settings)
-		#expect(coordinator.fullPath == [.detail])
+		#expect(coordinator.path == [.detail])
 	}
 
 	@Test func dismissPopsPushedScreenFirst() {
 		let coordinator = HarmonyCoordinator(TestScreen.home)
 		coordinator.push(TestScreen.detail)
 		coordinator.dismiss()
-		#expect(coordinator.fullPath.isEmpty)
+		#expect(coordinator.path.isEmpty)
 	}
 
 	@Test func presentationConfigIsStoredOnPresentedCoordinator() {
@@ -156,7 +156,7 @@ struct HarmonyCoordinatorTests {
 	@Test func dismissStackAtRootDoesNothing() {
 		let coordinator = HarmonyCoordinator([TestScreen.home, .detail])
 		coordinator.dismissStack()
-		#expect(coordinator.fullPath == [.detail])
+		#expect(coordinator.path == [.detail])
 	}
 
 	@Test func dismissOnPresentedRootRemovesItFromParent() {

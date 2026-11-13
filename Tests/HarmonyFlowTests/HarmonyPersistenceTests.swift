@@ -20,7 +20,7 @@ struct HarmonyPersistenceTests {
 		let original = HarmonyCoordinator([TestScreen.home, .detail, .settings])
 		let restored = try HarmonyCoordinator(restoring: original.encodedState())
 		#expect(restored.root == .home)
-		#expect(restored.fullPath == [.detail, .settings])
+		#expect(restored.path == [.detail, .settings])
 	}
 
 	@Test func presentedTreeSurvivesRoundTrip() throws {
@@ -31,7 +31,7 @@ struct HarmonyPersistenceTests {
 
 		let restored = try HarmonyCoordinator(restoring: original.encodedState())
 		#expect(restored.sheetCoordinator?.root == .settings)
-		#expect(restored.sheetCoordinator?.fullPath == [.detail])
+		#expect(restored.sheetCoordinator?.path == [.detail])
 		#expect(restored.sheetCoordinator?.configuration.detents == [.fraction(0.75)])
 		#expect(restored.sheetCoordinator?.configuration.isInteractiveDismissDisabled == true)
 	}
@@ -48,7 +48,7 @@ struct HarmonyPersistenceTests {
 	@Test func replacePathSwapsWholePath() {
 		let coordinator = HarmonyCoordinator([TestScreen.home, .detail])
 		coordinator.replacePath([TestScreen.settings, .detail, .settings])
-		#expect(coordinator.fullPath == [.settings, .detail, .settings])
+		#expect(coordinator.path == [.settings, .detail, .settings])
 	}
 
 	@Test func tabStateRoundTrips() throws {
@@ -59,8 +59,8 @@ struct HarmonyPersistenceTests {
 		let restored = try HarmonyTabCoordinator<TestTab>(restoring: tabs.encodedState())
 		#expect(restored.selectedTab == .profile)
 		#expect(restored.isTabBarHidden)
-		#expect(restored.coordinator(for: .home).fullPath == [.detail])
-		#expect(restored.coordinator(for: .profile).fullPath.isEmpty)
+		#expect(restored.coordinator(for: .home).path == [.detail])
+		#expect(restored.coordinator(for: .profile).path.isEmpty)
 	}
 
 	@Test func tabLevelBottomSheetRoundTripsWithWorkingHostLinks() throws {
@@ -79,9 +79,9 @@ struct HarmonyPersistenceTests {
 		split.detailCoordinator.push(TestScreen.detail)
 
 		let restored = try HarmonySplitCoordinator(restoring: split.encodedState())
-		#expect(restored.sidebarCoordinator.fullPath == [.settings])
+		#expect(restored.sidebarCoordinator.path == [.settings])
 		#expect(restored.contentCoordinator?.root == .detail)
 		#expect(restored.detailCoordinator.root == .settings)
-		#expect(restored.detailCoordinator.fullPath == [.detail])
+		#expect(restored.detailCoordinator.path == [.detail])
 	}
 }
