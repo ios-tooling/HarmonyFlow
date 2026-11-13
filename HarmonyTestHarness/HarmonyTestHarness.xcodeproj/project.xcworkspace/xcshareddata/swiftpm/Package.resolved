@@ -1,31 +1,31 @@
 {
-  "originHash" : "19ad05753a07486a9573a93c06bfba6027a6313d130acc30413837fc42cf9d9d",
+  "originHash" : "5c83a3411101c5b1dfa5ae5df8cda917f56d01bdf49c27d22b9fa4dd521f90ff",
   "pins" : [
     {
       "identity" : "chronicle",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ios-tooling/chronicle",
+      "location" : "https://github.com/ios-tooling/Chronicle",
       "state" : {
-        "revision" : "5a44da99206272e63c299857edff548c95a378a5",
-        "version" : "0.0.29"
+        "revision" : "ea56f5a98285bdd44eafbb3caeb3781b6a81aba6",
+        "version" : "0.0.35"
       }
     },
     {
       "identity" : "cloudseeding",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ios-tooling/cloudseeding",
+      "location" : "https://github.com/ios-tooling/CloudSeeding",
       "state" : {
-        "revision" : "d25fa5226c974678bd3823c14aeaf6db28827225",
-        "version" : "0.2.1"
+        "revision" : "a5efb7bd18f8737390163f48f7d9a35b0f619c19",
+        "version" : "0.2.4"
       }
     },
     {
       "identity" : "suite",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ios-tooling/suite",
+      "location" : "https://github.com/ios-tooling/Suite",
       "state" : {
-        "revision" : "8df7169ff05f93b38bb6ea2dc0efeda68c6ef337",
-        "version" : "1.4.12"
+        "revision" : "53dd5979cde287e2c9d062d33e7e7844b086d7df",
+        "version" : "1.4.24"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ios-tooling/TagAlong",
       "state" : {
-        "revision" : "c15cd80a5870989c6d12ecdcad1e32d81bf550a8",
-        "version" : "0.0.5"
+        "revision" : "695ae32ef05d2f425b997b012b1d023ec435319f",
+        "version" : "0.0.8"
       }
     }
   ],
