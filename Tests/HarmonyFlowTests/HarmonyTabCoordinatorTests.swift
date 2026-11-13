@@ -55,6 +55,63 @@ struct HarmonyTabCoordinatorTests {
 		#expect(tabs.coordinator(for: .profile).sheetCoordinator?.root == .detail)
 	}
 
+	@Test func showPushInAnotherTabClosesTheEarlierTabsModal() {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		tabs.show(TestScreen.home, in: .home, config: .init(action: .partialModal))
+		tabs.show(TestScreen.detail, in: .profile)
+		#expect(tabs.selectedTab == .profile)
+		#expect(tabs.coordinator(for: .home).presentedModal == nil)
+		#expect(tabs.coordinator(for: .profile).path == [.detail])
+		#expect(tabs.topScreen == .detail)
+	}
+
+	@Test func showBottomSheetInAnotherTabClosesTheEarlierTabsModal() {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		tabs.show(TestScreen.home, in: .home, config: .init(action: .partialModal))
+		tabs.show(TestScreen.detail, in: .profile, config: .init(action: .bottomSheet))
+		#expect(tabs.coordinator(for: .home).presentedModal == nil)
+		#expect(tabs.presentedBottomSheet?.root == .detail)
+	}
+
+	@Test func showPushInTheSameTabLeavesItsOwnModal() {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		let home = tabs.coordinator(for: .home)
+		home.partialModal(TestScreen.settings)
+		tabs.show(TestScreen.detail, in: .home)
+		#expect(home.presentedModal != nil)
+		#expect(home.path == [.detail])
+	}
+
+	@Test func showPushClosesAModalPresentedFromAnotherTabsBottomSheet() {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		tabs.coordinator(for: .home).bottomSheet(TestScreen.detail)
+		tabs.presentedBottomSheet?.partialModal(TestScreen.settings)
+		#expect(tabs.presentedBottomSheet?.presentedModal != nil)
+		tabs.show(TestScreen.detail, in: .profile)
+		#expect(tabs.presentedBottomSheet != nil)
+		#expect(tabs.presentedBottomSheet?.presentedModal == nil)
+	}
+
+	@Test func showModalInAnotherTabLeavesTheEarlierModalToSwiftUI() {
+		// on screen SwiftUI replaces the earlier sheet and the coordinator follows through the sheet
+		// binding; dismissing here too made UIKit log "Attempt to dismiss … while a presentation or
+		// dismiss is in progress"
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		tabs.coordinator(for: .home).partialModal(TestScreen.settings)
+		tabs.show(TestScreen.detail, in: .profile, config: .init(action: .partialModal))
+		#expect(tabs.coordinator(for: .home).presentedModal != nil)
+	}
+
+	@Test func showPushInAnotherTabResumesAPendingPresentation() async {
+		let tabs = HarmonyTabCoordinator(selected: TestTab.home)
+		let home = tabs.coordinator(for: .home)
+		async let pending: Int? = home.present(TestScreen.settings)
+		while home.presentedModal == nil { await Task.yield() }
+		tabs.show(TestScreen.detail, in: .profile)
+		let result = await pending
+		#expect(result == nil)
+	}
+
 	@Test func tabBottomSheetsHoistToTabCoordinator() {
 		// bottom sheets render above the tab bar, so the tab coordinator hosts them
 		let tabs = HarmonyTabCoordinator(selected: TestTab.home)

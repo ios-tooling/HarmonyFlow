@@ -48,6 +48,12 @@ extension HarmonyCoordinator {
 		return true
 	}
 
+	// drops the modals showing from this stack: its own, and one presented from its bottom sheet
+	func dismissModals() {
+		modalCoordinator = nil
+		presentedBottomSheet?.modalCoordinator = nil
+	}
+
 	public func popToRoot() {
 		_screens.removeAll()
 	}

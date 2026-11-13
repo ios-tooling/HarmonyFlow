@@ -48,8 +48,16 @@ import SwiftUI
 	/// The frontmost screen on screen: the top screen of `topCoordinator`.
 	public var topScreen: HarmonyScreen { topCoordinator.topScreen }
 
+	/// Selects `tab`, then shows the destination on its stack.
+	///
+	/// A push or a bottom sheet first closes any modal another tab is presenting, which would otherwise stay on
+	/// screen over this tab (a `present` caller waiting on it resumes with `nil`). When the destination is itself
+	/// a modal nothing is closed here: SwiftUI replaces the other tab's modal as it presents the new one.
 	public func show(_ destination: any HarmonyDestination, in tab: Tab, config: HarmonyNavigationConfiguration = .init(action: .push)) {
 		selectedTab = tab
+		if config.action == .push || config.action == .bottomSheet {
+			for (other, stack) in stacks where other != tab { stack.dismissModals() }
+		}
 		coordinator(for: tab).show(destination, config: config)
 	}
 
