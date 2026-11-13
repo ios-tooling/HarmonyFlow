@@ -42,7 +42,7 @@ Sources/HarmonyFlow/
   HarmonyStack.swift                  renders a single HarmonyCoordinator (NavigationStack + sheet/cover + bottom-sheet overlay)
   HarmonyBottomSheet.swift            the draggable overlay card (HarmonyFlow-rendered, NOT a system sheet)
   HarmonyBottomSheetHosting.swift     internal protocol; lets a tab coordinator host a stack's bottom sheet
-  HarmonyCoordinator/                 the stack coordinator, split across +Show / +Path / +Present / +Persistence
+  HarmonyCoordinator/                 the stack coordinator, split across +Show / +Path / +Present / +Reading / +Persistence
   HarmonyTabs/                        HarmonyTab, HarmonyTabCoordinator (+Persistence), HarmonyTabs view
   HarmonySplit/                       HarmonySplitCoordinator (+Persistence), HarmonySplit view
   Persistence/                        HarmonyScreenRegistry + HarmonyScreen Codable (polymorphic encode/decode)
@@ -66,11 +66,24 @@ Conventions (from the owner's global `CLAUDE.md`, enforced here): files ≈100 l
 
 6. **Coordinators are root-level containers.** `HarmonyTabs` / `HarmonySplit` can't be presented *inside* a `HarmonyStack` (everything there is inside a `NavigationStack`). They're app roots only.
 
+7. **Reads go through the `presented…` accessors, not the raw slots.** The public read API (`root`, `path`, `presentedModal`, `presentedBottomSheet`, `topCoordinator`, `screens`, `topScreen` in `HarmonyCoordinator+Reading.swift`; `presentedBottomSheet`, `topCoordinator`, `topScreen` on `HarmonyTabCoordinator`) is what apps, tests and agent control surfaces use instead of decoding `encodedState()`. The slots stay internal. `presentedBottomSheet` resolves the tab hoist: under tabs a stack's own `bottomSheetCoordinator` slot is always nil and its sheet sits on the tab coordinator with `parentCoordinator` pointing back (the same "belongs to us" test `collapse()` uses), so anything that walks the tree to read it must use the accessor. On-screen order is own stack, bottom sheet, modal; `screens` and `topCoordinator` both encode that, so change them together. `dismissTopFlow()` goes through `dismissStack()`, i.e. the funnel in #1.
+
 ## Platform differences (expected, not bugs)
 
 - **macOS has no `fullScreenCover`** → `fullScreenModal` degrades to a system sheet. `HarmonyAction.isSheet` returns `true` for `fullScreenModal` on macOS, and `fullScreenCoordinator` returns `nil` there. Tests that assert iOS routing are `#if os(iOS)`-gated; the macOS branch asserts the sheet path.
 - **`PresentationDetent` is iOS-only.** `HarmonyDetent`'s `presentationDetent` mapping and the action detent defaults are `#if os(iOS)`. The bottom-sheet overlay uses `resolvedHeight(in:)` instead, which works on both.
 - **Tab-bar hiding** (`.toolbarVisibility(.hidden, for: .tabBar)`) is iOS-only.
+
+## Presentations across tabs (measured on the simulator; don't re-derive)
+
+SwiftUI draws sheets and covers over the whole window, so one tab's presentation interacts with the others. Measured in the harness on iOS 26.5 and 27.1, with the coordinator's state logged beside screenshots:
+
+- **Selecting another tab in code leaves the earlier tab's sheet on screen**, over the newly selected tab; left to SwiftUI, a push in another tab does the same. The coordinator keeps the sheet in the earlier tab, so the selected tab's top screen is not always what is frontmost. `HarmonyTabCoordinator.topCoordinator` / `topScreen` exist for exactly this: a tab presenting a modal comes before the selected tab.
+- **`HarmonyTabCoordinator.show` closes that sheet for a push or a bottom sheet.** It calls `dismissModals()` on every other tab's stack first, because nothing else would. Checked on screen, including a `show` arriving 0.3 s after the sheet started animating in: the sheet goes and UIKit logs nothing. Plain `selectedTab = …` is deliberately left alone.
+- **Showing a modal in another tab already replaces the earlier tab's sheet.** SwiftUI dismisses it, writes nil through its binding (the `sheetCoordinator` setter tears it down, so a pending `present` resumes with nil), then presents the new modal. `HarmonyTabCoordinator.show` must not dismiss the other tab's modal itself when the destination is a modal: that was tried, gave identical screens, and made UIKit log "Attempt to dismiss from view controller … while a presentation or dismiss is in progress!".
+- **A modal requested while another tab's sheet is still animating in is dropped.** UIKit refuses it ("Attempt to present … which is already presenting …") and nothing retries, so the coordinator lists a flow that is not on screen until the next change. A gap of 0.4 s fails and 0.8 s works. Not fixed; pacing presentations in `HarmonyStack` would be the place.
+
+Unit tests cannot see any of this, because they run without SwiftUI's presentation machinery. To measure again, drive `HarmonyTestHarness` from a temporary `.task` in `ContentView` keyed on a launch argument, `NSLog` each tab's `screens` and `tabs.topScreen`, capture the console with `xcrun simctl spawn <udid> log stream`, and screenshot with `xcrun simctl io <udid> screenshot`. Revert the driver afterwards.
 
 ## Persistence pattern
 
@@ -83,3 +96,4 @@ Each coordinator level has a sibling `+Persistence.swift` with a `Snapshot` stru
 - Navigation methods take `any HarmonyDestination`, so **leading-dot shorthand doesn't work** — qualify the case (`push(Screen.detail)`, not `push(.detail)`). In tests, free `==` overloads (`HarmonyScreen` vs the test enum) keep assertions like `root == .detail` reading naturally; arguments to methods still need qualifying.
 - Container coordinators should be fetched from the environment **optionally** in screens shared across container types (a split root has no tab coordinator, and vice-versa). The stack `HarmonyCoordinator` is always present.
 - `finish(returning:)` takes `(any Sendable)?` — that's the Swift 6 continuation-crossing requirement, not a design choice.
+- `HarmonyStackReadingTests` and `HarmonyTabReadingTests` import HarmonyFlow **without `@testable`** on purpose: they only compile while the read API is public. Keep internal names (`modalCoordinator`, `sheetCoordinator`, …) out of those two files.
