@@ -55,7 +55,7 @@ import SwiftUI
 	/// a modal nothing is closed here: SwiftUI replaces the other tab's modal as it presents the new one.
 	public func show(_ destination: any HarmonyDestination, in tab: Tab, config: HarmonyNavigationConfiguration = .init(action: .push)) {
 		selectedTab = tab
-		if config.action == .push || config.action == .bottomSheet {
+		if !config.action.isModal {
 			for (other, stack) in stacks where other != tab { stack.dismissModals() }
 		}
 		coordinator(for: tab).show(destination, config: config)

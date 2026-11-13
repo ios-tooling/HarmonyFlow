@@ -29,6 +29,8 @@ import SwiftUI
 	/// The screen at the bottom of this coordinator's stack.
 	public internal(set) var root: HarmonyScreen
 	var configuration = HarmonyNavigationConfiguration(action: .push)
+	// true while this presented modal waits its turn to go on screen (see HarmonyPresentationPacer)
+	var isHeld = false
 
 	var action: HarmonyAction { configuration.action }
 
@@ -86,6 +88,7 @@ import SwiftUI
 			}
 		} else {
 			new.parentCoordinator = self
+			HarmonyPresentationPacer.shared.pace(new)
 			modalCoordinator = new
 		}
 		return new
@@ -104,6 +107,7 @@ import SwiftUI
 	// slot is a no-op and recursion terminates at the leaves)
 	func tearDownPresentation() {
 		resolvePendingPresentation()
+		if action.isModal { HarmonyPresentationPacer.shared.modalRemoved(self) }
 		modalCoordinator = nil
 		bottomSheetCoordinator = nil
 	}

@@ -37,17 +37,20 @@ public struct HarmonyStack: View {
 		}
 		.animation(.spring, value: coordinator.bottomSheetCoordinator?.id)
 		#if os(iOS)
-			.sheet(item: $coordinator.sheetCoordinator) { sheet in
+			.sheet(item: $coordinator.shownSheetCoordinator) { sheet in
 				HarmonyStack(sheet)
+					.onAppear { HarmonyPresentationPacer.shared.notePresentation() }
 					.presentationDetents(sheet.presentationDetents)
 					.interactiveDismissDisabled(sheet.configuration.isInteractiveDismissDisabled)
 			}
-			.fullScreenCover(item: $coordinator.fullScreenCoordinator) { cover in
+			.fullScreenCover(item: $coordinator.shownFullScreenCoordinator) { cover in
 				HarmonyStack(cover)
+					.onAppear { HarmonyPresentationPacer.shared.notePresentation() }
 			}
 		#else
-			.sheet(item: $coordinator.sheetCoordinator) { sheet in
+			.sheet(item: $coordinator.shownSheetCoordinator) { sheet in
 				HarmonyStack(sheet)
+					.onAppear { HarmonyPresentationPacer.shared.notePresentation() }
 					.interactiveDismissDisabled(sheet.configuration.isInteractiveDismissDisabled)
 			}
 		#endif

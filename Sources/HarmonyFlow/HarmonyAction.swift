@@ -20,6 +20,8 @@ public enum HarmonyAction: Hashable, Equatable, Codable {
 		#endif
 		return self == .partialModal || self == .bottomSheet
 	}
+
+	var isModal: Bool { self == .partialModal || self == .fullScreenModal }
 }
 
 #if os(iOS)

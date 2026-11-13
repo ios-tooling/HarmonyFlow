@@ -102,6 +102,7 @@ coordinator.collapse()             // back to a pristine root: pop everything + 
 - `push` on a coordinator that is presenting a modal adds to that coordinator's own path, beneath the modal. Push on `coordinator.topCoordinator` to push inside the presented flow.
 - A coordinator presents one modal at a time, so a second `partialModal` / `fullScreenModal` from the same coordinator replaces the first. Present from the presented flow's coordinator to stack them.
 - A bottom sheet stays up beneath a modal presented from the same coordinator.
+- Modals take turns going on screen. UIKit refuses a sheet or cover requested while another modal transition is still in flight, so one requested then is held until that transition has had time to finish (up to about a second), then shown. The coordinator's state changes at once; the screen follows. Pushes, bottom sheets and dismissals are not held.
 
 ## Per-presentation configuration
 
@@ -176,7 +177,6 @@ Sheets and covers are drawn over the whole window, whichever tab presented them,
 - Selecting another tab in code (`tabs.selectedTab = …`) leaves a sheet the earlier tab presented on screen, over the newly selected tab. It still belongs to the earlier tab's coordinator; `tabs.topScreen` reports what is actually frontmost.
 - `tabs.show` does not leave it there: a push or bottom sheet shown in one tab first closes any modal another tab is presenting (a `present` caller waiting on it resumes with `nil`).
 - A modal shown in another tab replaces it as well, through SwiftUI: it takes the earlier tab's sheet down, then presents the new modal, and the earlier tab's coordinator drops the sheet.
-- Leave about a second between two such presentations. A modal requested while another tab's sheet is still animating in is refused by UIKit and never retried, so the coordinator lists a flow that is not on screen.
 
 ## Split views
 
@@ -208,7 +208,7 @@ tabs.topCoordinator               // under tabs: the frontmost flow, whichever t
 tabs.topScreen                    // … and its top screen
 ```
 
-`screens` lists the coordinator's own stack, then its bottom sheet's screens, then its modal's — the order they sit on screen. Under tabs, read one tab through `tabs.coordinator(for: .home).screens` and the frontmost screen across tabs through `tabs.topScreen`: a modal covers every tab, so a tab presenting one comes before the selected tab. A tab's bottom sheet is hosted above the tab bar but still reported by the tab that presented it; `tabs.presentedBottomSheet` is that sheet whichever tab presented it. These values are the coordinator's state. The screen follows them, though not instantly, and a presentation UIKit refuses (see Tabs) is listed without being on screen.
+`screens` lists the coordinator's own stack, then its bottom sheet's screens, then its modal's — the order they sit on screen. Under tabs, read one tab through `tabs.coordinator(for: .home).screens` and the frontmost screen across tabs through `tabs.topScreen`: a modal covers every tab, so a tab presenting one comes before the selected tab. A tab's bottom sheet is hosted above the tab bar but still reported by the tab that presented it; `tabs.presentedBottomSheet` is that sheet whichever tab presented it. These values are the coordinator's state. The screen follows them, though not instantly: a sheet or cover that is waiting its turn (see "Showing while something is presented") is listed before it is on screen.
 
 ## State persistence & deep linking
 
